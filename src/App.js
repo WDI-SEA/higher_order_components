@@ -1,25 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: 'Dan Abramov'
+    };
+  };
+
+  render() {
+    
+    return (
+      <div className=''>
+        <Header />
+        <Welcome />
+      </div>
+    )
+  }
+};
 
 export default App;
+
+class Header extends React.Component {
+  render() {
+    return (
+      <div className='header'>
+        <h4>User</h4>
+      </div>
+    )
+  }
+};
+
+class Welcome extends React.Component {
+  render() {
+    return (
+      <div>
+        <p>Hello User</p>
+        <p>Thanks for coming back</p>
+      </div>
+    )
+  }
+};
+
+function withUser(WrappedComponent) {
+  return class WrappedComponent extends React.Component {
+    render() {
+      return <WrappedComponent {...this.props} />
+    }
+  }
+};
+
+const HeaderWithUser = withUser(Header)
