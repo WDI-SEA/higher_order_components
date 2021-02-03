@@ -1,70 +1,154 @@
-# Getting Started with Create React App
+# React: Higher-Order Components
+## Introduction
+A Higher-Order Component (HOC) is an advanced technique in React for reusing component logic.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+HOCs are not a part of the React API, per se. They are a pattern that emerges from React's compositional nature.
 
-## Available Scripts
+You can view the React team's full documentation on HOCs [here](https://reactjs.org/docs/higher-order-components.html).
 
-In the project directory, you can run:
+The crux of it is that **a higher order component is a function that takes a component and returns a *new* component**.
 
-### `npm start`
+What does this really mean, though?
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Let's do a quick recap over some other terminology for a little background.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Pure Functions
+The types of functions we are used to writing, or, at least, have been encouraged to write thus far, are known as 'Pure functions'. These are functions that meet three criteria:
+* All data used by the function is declared as an argument
+* The function does not mutate the data it was given, nor any other data, for that matter
+* Given the same input, the function will produce the same result
 
-### `npm test`
+Let's use an example of a basic add function.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+function goodAdd(x, y) {
+    return x + y;
+};
+```
 
-### `npm run build`
+This function receives two arguments which it then adds together to return a total value.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+All of the data we are using are passed as arguments; we aren't mutating any data outside of the function; and, given the same input, it will always return the same output, so: a pure function.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+In contrast, let's write a function called badAdd that takes one parameter (x) and adds it to an external value (y).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+let y = 2;
 
-### `npm run eject`
+function badAdd(x) {
+    return x + y
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+What issues might this cause?
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**It's important to note that HOCs operate under the criteria that make up a pure function.**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Higher-Order Functions
+Much the same as HOCs return new components a Higher-Order Function (HOF) is one which returns a new function. In many cases, this will mean the HOF taking a function as an argument, although this is not always the case.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Taking our ***good*** add function, let's say we wanted to log any result to the console pior to returning a result.
 
-## Learn More
+In certain cases we may be unable to edit the original function (e.g. it is being used for an additional purpose), however we can use it to create a new one.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+function addAndLog(x, y) {
+    const results = add(x, y);
+    console.log(`Result: ${result}`)
+    return results;
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This function is great. It allows us to do exactly what we want. The only problem is that it's a tad verbose if, for instance, we wanted to do the same thing with a subtract function or a multiplication function.
 
-### Code Splitting
+The simple answer is that we can use a HOF to do this.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```
+function logAndReturn(callback) {
+    return callback (...args) {
+        const result = callback(...args);
+        console.log(`Result: ${result}`);
+        return result;
+    }
+};
 
-### Analyzing the Bundle Size
+<!-- we create the functions like this -->
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+const addAndLog = logAndReturn(add);
+const subtractAndLog = logAndReturn(subtract);
 
-### Making a Progressive Web App
+<!-- and invoke like this -->
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+addAndLog(4, 4)     // expected output 8
+subtractAndLog(5,4) // expected output 1
 
-### Advanced Configuration
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Higher-Order Components
+HOCs work in a similar way to HOFs. Within what we just did, we created new functions. In React, we create new components. So how do we do this?
 
-### Deployment
+Let's take an example of an extremely basic HOC. Spin up a new React application on your machine and `npm start` in your terminal.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Let's remove everything inside our `App.js` and replace it with the following code.
 
-### `npm run build` fails to minify
+```
+import React from 'react';
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+    render() {
+        return (
+            <div>
+                <h1>Hello World</h1>   
+            </div>
+        )
+    }
+};
+
+export default App;
+```
+If we look in our browser, we should see **Hello World** printed out.
+
+Inside your `App.js`, underneath export default App, we're going to create an additional two components.
+
+```
+class Header extends React.Component {
+  render() {
+    return (
+      <div className='header'>
+        <h4>User</h4>
+      </div>
+    )
+  }
+};
+
+class Welcome extends React.Component {
+  render() {
+    return (
+      <div>
+        <p>Hello User</p>
+        <p>Thanks for coming back</p>
+      </div>
+    )
+  }
+};
+```
+
+Okay, now for the cool part.
+
+Each of these components relates to our user and, therefore, we can use a HOC to personalize our user's experience.
+
+Let's start by updating state.
+
+```
+this.state = {
+    user: 'Dan Abramov'
+}
+```
+
+Okay, so now that Dan Abramov is using your React app, you feel like you've made it, but we still have one more step to do.
+
+Let's write a function that takes each of these components and returns new and improved ones with some user data.
