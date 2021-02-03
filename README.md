@@ -152,3 +152,40 @@ this.state = {
 Okay, so now that Dan Abramov is using your React app, you feel like you've made it, but we still have one more step to do.
 
 Let's write a function that takes each of these components and returns new and improved ones with some user data.
+
+```
+function withUser(Component) {
+    return class extends React.Component {
+        render() {
+            return <Component {...this.props} />
+        }
+    }
+};
+```
+What we've done here is create a HOC. It takes an initial component, and returns a new component, while passing down props.
+
+We now need to create the new components and we can do so by using this code.
+
+```
+const HeaderWithUser = withUser(Header);
+const WelcomeWithUser = withUser(Welcome);
+```
+
+We then call each of these inside the render method of our `App.js`, replacing the old components and passing in our user from state.
+
+```
+<div>
+    <HeaderWithUser user={this.state.user} />
+    <WelcomeWithUser user={this.state.user} />
+</div>
+```
+
+And there you have it! Now, obviously this is an extremely basic implementation of a HOC. Can anyone think of a real world application?
+
+## Review
+-    HOCs are components which take an existing component as an argument and return a new component
+-    They must fit the criteria of a pure function, in that:
+    -    All data used by the HOC is passed in
+    -    It does not mutate any of the data it uses
+    -    Given the same input, it will provide the same output
+
